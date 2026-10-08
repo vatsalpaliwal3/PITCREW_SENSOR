@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101317">
+  <meta name="color-scheme" content="dark light">
+  <title>Pothole Sensor</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./env.js"></script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" class="logo-bg"/><path d="M5 22h5l3-9 4 13 3-8 2 4h5" class="logo-line"/></svg>
+      <div>
+        <h1>Pothole Sensor</h1>
+        <p class="sub">Phone bump detector</p>
+      </div>
+    </div>
+    <span id="conn" class="pill" data-state="idle"><span class="dot"></span><span id="connText">Not connected</span></span>
+  </header>
+
+  <div id="banners" class="banners" role="status" aria-live="polite"></div>
+
+  <main>
+    <section class="card hero" aria-labelledby="detLabel">
+      <div class="hero-head">
+        <h2 id="detLabel">Detector</h2>
+        <span id="runState" class="run-state" data-on="false">Stopped</span>
+      </div>
+      <div class="meter" aria-hidden="true">
+        <div class="meter-fill" id="meterFill"></div>
+        <div class="meter-mark" id="meterMark"></div>
+      </div>
+      <div class="meter-scale"><span>0</span><span id="thrLabel">threshold 3.0</span><span>10 m/s²</span></div>
+      <button id="toggleBtn" class="btn primary big" type="button">Start detecting</button>
+      <p id="hint" class="hint">Mount the phone in a holder with the screen on, then tap Start. Sensors and GPS need your permission.</p>
+    </section>
+
+    <section class="card" aria-labelledby="telLabel">
+      <h2 id="telLabel">Live readings</h2>
+      <dl class="grid">
+        <div><dt>X</dt><dd id="vX">–</dd></div>
+        <div><dt>Y</dt><dd id="vY">–</dd></div>
+        <div><dt>Z</dt><dd id="vZ">–</dd></div>
+        <div><dt>Deviation</dt><dd id="vDev">–</dd></div>
+        <div><dt>Speed</dt><dd id="vSpeed">–</dd></div>
+        <div><dt>GPS accuracy</dt><dd id="vAcc">–</dd></div>
+        <div class="wide"><dt>Position</dt><dd id="vPos">waiting for GPS</dd></div>
+        <div><dt>Sample rate</dt><dd id="vHz">–</dd></div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="cntLabel">
+      <h2 id="cntLabel">Events</h2>
+      <div class="counters">
+        <div><b id="cDet">0</b><span>detected</span></div>
+        <div><b id="cSent">0</b><span>sent</span></div>
+        <div><b id="cQueue">0</b><span>queued</span></div>
+        <div><b id="cRej">0</b><span>rejected</span></div>
+      </div>
+      <div class="actions">
+        <button id="testBtn" class="btn" type="button">Send test event</button>
+        <button id="replayBtn" class="btn" type="button">Replay drive</button>
+        <button id="csvBtn" class="btn ghost" type="button">Use my CSV…</button>
+        <button id="flushBtn" class="btn ghost" type="button">Flush queue</button>
+        <input id="csvInput" type="file" accept=".csv,text/csv" hidden>
+      </div>
+      <p id="actionNote" class="hint"></p>
+      <ul id="log" class="log" aria-label="Recent events"></ul>
+      <details class="reply">
+        <summary>Last server reply</summary>
+        <pre id="reply">Nothing sent yet.</pre>
+      </details>
+    </section>
+
+    <details class="card settings" id="settings">
+      <summary><h2>Settings</h2></summary>
+      <div class="field">
+        <label for="apiUrl">API base URL</label>
+        <input id="apiUrl" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://your-api-host">
+        <small id="apiUrlHelp">HTTPS origin of the backend. No trailing slash, no /v1.</small>
+      </div>
+      <div class="field">
+        <label for="sensorKey">Sensor key</label>
+        <input id="sensorKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="X-Sensor-Key value">
+        <small>Same value as SENSOR_API_KEY on the backend. It only blocks random spam, it is not a secret.</small>
+      </div>
+      <div class="field row">
+        <label for="demoMode">Demo mode (send even when not moving)</label>
+        <input id="demoMode" type="checkbox" role="switch">
+      </div>
+      <div class="field">
+        <label for="mount">Phone orientation</label>
+        <select id="mount">
+          <option value="auto">Any orientation (recommended)</option>
+          <option value="flat">Lying flat (raw Z axis)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>This page's origin (Nikhil adds it to ALLOWED_ORIGINS)</label>
+        <div class="copyrow"><code id="origin"></code><button id="copyOrigin" class="btn ghost small" type="button">Copy</button></div>
+      </div>
+      <div class="field">
+        <label>Device ID</label>
+        <code id="deviceId" class="wrap"></code>
+      </div>
+      <div class="actions">
+        <button id="saveBtn" class="btn primary" type="button">Save &amp; test connection</button>
+        <button id="resetBtn" class="btn ghost" type="button">Reset</button>
+      </div>
+      <p id="settingsNote" class="hint"></p>
+      <p id="cfgNote" class="hint"></p>
+    </details>
+  </main>
+
+  <footer class="foot">Synthetic replay data for demos. Detection runs on your phone; only bump events are sent.</footer>
+</div>
+</body>
+</html>
